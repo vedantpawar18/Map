@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   Container,
   Typography,
@@ -8,10 +8,12 @@ import {
   Link,
   Grid,
   Box,
+  Snackbar,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { Icon } from "@iconify/react";
 import IconButton from "@mui/material/IconButton";
+import MuiAlert from "@mui/material/Alert";
 import Navbar from "../Components/Navbar";
 import ThemeContext from "../Context/ThemContext";
 
@@ -32,13 +34,47 @@ const MyButton = styled(Button)({
 });
 
 const Login = () => {
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const { theme } = useContext(ThemeContext);
-  const handleSubmit = (event) => {
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const handleSnackbar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Implement your login logic here
-    console.log(`Logging in with username: ${username}, password: ${password}`);
+
+    try {
+      const response = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Login successful:", data);
+        handleSnackbar("Login successful");
+      } else {
+        const errorData = await response.json(); 
+        handleSnackbar(`Login failed: ${errorData.message}`);
+      }
+    } catch (error) { 
+      handleSnackbar("Error during login");
+    }
   };
 
   const backgroundColor = theme === "dark" ? "#152433" : "white";
@@ -49,7 +85,7 @@ const Login = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        minHeight: "100vh", 
+        minHeight: "100vh",
         backgroundColor: backgroundColor,
       }}
     >
@@ -69,7 +105,8 @@ const Login = () => {
             overflow: "hidden",
             height: "40%",
             paddingLeft: 2,
-            paddingRight: 2, paddingTop:"20px"
+            paddingRight: 2,
+            paddingTop: "20px",
           }}
         >
           {/* Replace this with your actual image component */}
@@ -81,7 +118,13 @@ const Login = () => {
         </Box>
         <Box
           className="login-container"
-          sx={{ flex: 1, paddingLeft: 2, paddingRight: 2, height: "80%", paddingTop:"20px"}}
+          sx={{
+            flex: 1,
+            paddingLeft: 2,
+            paddingRight: 2,
+            height: "80%",
+            paddingTop: "20px",
+          }}
         >
           <MyContainer component="main" maxWidth="xs">
             <Typography component="h1" variant="h6" sx={{ color: textColor }}>
@@ -167,7 +210,8 @@ const Login = () => {
                 sx={{
                   width: "20%",
                   height: "2px",
-                  backgroundColor: textColor === "white" ? "#ccc" : "#666",
+                  backgroundColor:
+                    textColor === "white" ? "#ccc" : "#666",
                 }}
               />
               <Typography
@@ -183,7 +227,8 @@ const Login = () => {
                 sx={{
                   width: "20%",
                   height: "2px",
-                  backgroundColor: textColor === "white" ? "#ccc" : "#666",
+                  backgroundColor:
+                    textColor === "white" ? "#ccc" : "#666",
                 }}
               />
             </Box>
@@ -232,6 +277,20 @@ const Login = () => {
           </MyContainer>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity="success"
+        >
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
     </Box>
   );
 };
