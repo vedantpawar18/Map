@@ -72,7 +72,7 @@ const Login = () => {
         const errorData = await response.json(); 
         handleSnackbar(`Login failed: ${errorData.message}`);
       }
-    } catch (error) { 
+    } catch (error) {  
       handleSnackbar("Error during login");
     }
   };
