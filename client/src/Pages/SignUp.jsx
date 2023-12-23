@@ -15,8 +15,7 @@ import { Icon } from "@iconify/react";
 import IconButton from "@mui/material/IconButton";
 import MuiAlert from "@mui/material/Alert";
 import Navbar from "../Components/Navbar";
-import ThemeContext from "../Context/ThemContext"; 
-import { useNavigate } from "react-router-dom";
+import ThemeContext from "../Context/ThemContext";
 
 const MyContainer = styled(Container)({
   display: "flex",
@@ -34,24 +33,19 @@ const MyButton = styled(Button)({
   margin: (theme) => theme.spacing(3, 0, 2),
 });
 
-const Login = () => { 
-  const navigate = useNavigate();
+const Signup = () => {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const { theme } = useContext(ThemeContext);
 
-  const handleSnackbarClose = (event, reason) => { 
+  const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
     setSnackbarOpen(false);
-  };
-
-  const handleSignUpClick = () => {
-    // Use the history object to navigate to the signup page
-    navigate("/signup");
   };
 
   const handleSnackbar = (message) => {
@@ -63,29 +57,29 @@ const Login = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch("http://localhost:8080/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Login successful:", data);
-        handleSnackbar("Login successful");
+        console.log("Signup successful:", data);
+        handleSnackbar("Signup successful");
       } else {
-        const errorData = await response.json(); 
-        handleSnackbar(`Login failed: ${errorData.message}`);
+        const errorData = await response.json();
+        handleSnackbar(`Signup failed: ${errorData.message}`);
       }
-    } catch (error) {  
-      handleSnackbar("Error during login");
+    } catch (error) {
+      handleSnackbar("Error during signup");
     }
   };
 
   const backgroundColor = theme === "dark" ? "#152433" : "white";
-  const textColor = theme === "dark" ? "white" : "black"; // Set text color based on the theme
+  const textColor = theme === "dark" ? "white" : "black";
 
   return (
     <Box
@@ -116,7 +110,6 @@ const Login = () => {
             paddingTop: "20px",
           }}
         >
-          {/* Replace this with your actual image component */}
           <img
             src="https://www.freepnglogos.com/uploads/world-map-png/globe-world-world-map-graphic-design-png-image-with-20.png"
             alt="placeholder image"
@@ -124,7 +117,7 @@ const Login = () => {
           />
         </Box>
         <Box
-          className="login-container"
+          className="signup-container"
           sx={{
             flex: 1,
             paddingLeft: 2,
@@ -135,7 +128,7 @@ const Login = () => {
         >
           <MyContainer component="main" maxWidth="xs">
             <Typography component="h1" variant="h6" sx={{ color: textColor }}>
-              Welcome Back!
+              Create an Account
             </Typography>
             <MyForm onSubmit={handleSubmit}>
               <TextField
@@ -143,10 +136,25 @@ const Login = () => {
                 margin="normal"
                 fullWidth
                 id="username"
-                label="Username or Email"
+                label="Username"
                 name="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                required
+                sx={{
+                  backgroundColor: textColor === "white" ? "white" : "white",
+                }}
+              />
+              <TextField
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 sx={{
                   backgroundColor: textColor === "white" ? "white" : "white",
@@ -175,9 +183,9 @@ const Login = () => {
                   alignItems: "center",
                 }}
               >
-                <Checkbox id="remember-me" color="primary" />
-                <label htmlFor="remember-me" style={{ color: textColor }}>
-                  Remember Me
+                <Checkbox id="agree-terms" color="primary" />
+                <label htmlFor="agree-terms" style={{ color: textColor }}>
+                  I agree to the Terms and Conditions
                 </label>
               </Box>
               <MyButton
@@ -187,101 +195,22 @@ const Login = () => {
                 color="primary"
                 sx={{ backgroundColor: "teal", color: "white" }}
               >
-                Sign In
+                Sign Up
               </MyButton>
 
               <Grid container justifyContent="flex-end">
                 <Grid item sx={{ color: "grey" }}>
-                  {/* Added color: grey */}
-                  Don't have an account?
+                  Already have an account?
                   <Link
-                    href="/signup"
+                    href="/"
                     variant="body2"
                     sx={{ color: textColor }}
-                    onClick={handleSignUpClick}
                   >
-                    Sign Up
+                    Log In
                   </Link>
                 </Grid>
               </Grid>
             </MyForm>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "50%",
-                margin: "20px 0",
-              }}
-            >
-              <Box
-                sx={{
-                  width: "20%",
-                  height: "2px",
-                  backgroundColor:
-                    textColor === "white" ? "#ccc" : "#666",
-                }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  padding: "0 10px",
-                  color: textColor === "white" ? "#ccc" : "#666",
-                }}
-              >
-                OR
-              </Typography>
-              <Box
-                sx={{
-                  width: "20%",
-                  height: "2px",
-                  backgroundColor:
-                    textColor === "white" ? "#ccc" : "#666",
-                }}
-              />
-            </Box>
-            <Grid container justifyContent="center" spacing={2}>
-              <Grid item>
-                <Link href="#">
-                  <IconButton>
-                    <Icon sx={{ fontSize: 30 }}>
-                      {/* Use appropriate icon component and import necessary libraries */}
-                      <Icon icon="devicon:facebook" />
-                    </Icon>
-                  </IconButton>
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#">
-                  <IconButton>
-                    <Icon sx={{ fontSize: 30 }}>
-                      {/* Use appropriate icon component and import necessary libraries */}
-                      <Icon icon="flat-color-icons:google" />
-                    </Icon>
-                  </IconButton>
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#">
-                  <IconButton>
-                    <Icon sx={{ fontSize: 30 }}>
-                      {/* Use appropriate icon component and import necessary libraries */}
-                      <Icon icon="skill-icons:twitter" />
-                    </Icon>
-                  </IconButton>
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#">
-                  <IconButton>
-                    <Icon sx={{ fontSize: 30 }}>
-                      {/* Use appropriate icon component and import necessary libraries */}
-                      <Icon icon="skill-icons:linkedin" />
-                    </Icon>
-                  </IconButton>
-                </Link>
-              </Grid>
-            </Grid>
           </MyContainer>
         </Box>
       </Box>
@@ -303,4 +232,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
